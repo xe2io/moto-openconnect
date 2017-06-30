@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Set up authorized keys and sshd
+
+docker run -it --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 openconnect /mototunnel

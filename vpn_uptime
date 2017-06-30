@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Script to guesstimate the uptime of the VPN tunnel based on execution time of openconnect
+# happens to always be pid 11 :)
+# TODO: actually determine the pid
+PID=11
+ps -o etime $PID

@@ -10,5 +10,5 @@ mkdir -p /run/sshd /root/.ssh /etc/ssh \
 # Run sshd so we can tunnel
 /usr/sbin/sshd
 
-#openconnect --script-tun --script "ocproxy -D 60000 -k 90" -u "dktc47" --authgroup "Motorola-Issued PC" --juniper https://access.motorolasolutions.com
-openconnect -u "dktc47" --authgroup "Motorola-Issued PC" --juniper https://access.motorolasolutions.com
+# OpenConnect can't handle the new portal; use script to handle auth and pass through VPN Cookie
+/vpn_login.sh

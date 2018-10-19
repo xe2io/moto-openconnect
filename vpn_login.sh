@@ -3,7 +3,9 @@
 URL_PORTAL='https://access.motorolasolutions.com'
 URL_LOGIN="${URL_PORTAL}/dana-na/auth/url_default/login.cgi"
 
-# Okta Actions; 1 = Okta Verify (code; not supported); 2 = Okta Push
+# These are dependent on what user has configured in Okta
+# TODO: this keeps changing; now u2f disappeared
+# Okta Actions; 1 = U2F (FIDO 1.0); 2 = Okta Verify (code; not supported); 3 = Okta Push
 okta_action='2'
 
 realm='OKTA+Login'
@@ -58,7 +60,7 @@ data="username=${user}&key=${defender_id}&password=${okta_action}&btnAction=++Si
 
 # -H "Referer: $p1_url"
 
-echo "Requesting Okta Push.  Please acknowledge 2FA to continue..."
+echo "Requesting Okta Push.  Please acknowledge 2FA to continue."
 cookie_file=$(mktemp)
 
 curl -L -s ${URL_LOGIN} -o /dev/null --data "${data}" -c $cookie_file
@@ -75,4 +77,5 @@ fi
 
 echo "VPN Cookie: $vpn_cookie"
 echo -e "Launching OpenConnect with VPN Cookie..."
-openconnect --juniper --timestamp -C "$vpn_cookie" $URL_PORTAL
+echo "Disabling ESP since rekey issue (after ~1hr) is still unresolved."
+openconnect --juniper --timestamp --no-dtls -C "$vpn_cookie" $URL_PORTAL 

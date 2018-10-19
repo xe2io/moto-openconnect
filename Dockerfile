@@ -1,6 +1,6 @@
 FROM debian:stretch-slim
 # apt caching!  Remove when done
-RUN  echo 'Acquire::http { Proxy "http://172.17.0.1:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+RUN  echo 'Acquire::http { Proxy "http://heatsink.xe2:3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
 
 RUN apt-get update && apt-get install -y \

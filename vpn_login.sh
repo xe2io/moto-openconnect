@@ -77,5 +77,6 @@ fi
 
 echo "VPN Cookie: $vpn_cookie"
 echo -e "Launching OpenConnect with VPN Cookie..."
+openconnect --juniper --timestamp -C "$vpn_cookie" $URL_PORTAL 
 echo "Disabling ESP since rekey issue (after ~1hr) is still unresolved."
 openconnect --juniper --timestamp --no-dtls -C "$vpn_cookie" $URL_PORTAL 

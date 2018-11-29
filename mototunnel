@@ -5,7 +5,7 @@ mkdir -p /run/sshd /root/.ssh /etc/ssh \
     && chmod 700 /root/.ssh \
     && echo 'PermitRootLogin without-password' >> /etc/ssh/sshd_config \
     && echo 'TCPKeepAlive yes' >> /etc/ssh/sshd_config \
-    && echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5lczOxJ2wE6ZmIH8tUD+RX2urxZcorhSGruq9riSLOOEzebvkfdD+vqg6wrhupPoqcPvWYGzWiuPLAR6nPINQWTXvZ9GA2SH389uQRA3g6PUQDVTJ6tmB9dJ4IxkyCFJDmiXYmc+SgbZ2k6IzV9H7f3pRGPADht4hlhphv0r+gUkwR8vwtzcjrL5pkPE2m8M8yuvwsvaS2MGKfEWUd8Bpx6g46WhgfH7a16eMjcWshfm1p4tMnznzvk6zKqrLbkpNjOITUFo4imUijqY8N5jPF0nqAlMDTO7rZkHD6+g04mgWoDgNjHGJj1xtvGFW6CKHfj2FERVcz3AZ7wTNLi4l' > /root/.ssh/authorized_keys
+    && echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkFKmtyEjVcYDS1NMK760cn5oLaZNOKRjjOkh0wmRbj' > /root/.ssh/authorized_keys
     
 # Run sshd so we can tunnel
 /usr/sbin/sshd

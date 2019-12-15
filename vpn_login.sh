@@ -1,6 +1,11 @@
 #!/bin/bash
 
 URL_PORTAL='https://access.motorolasolutions.com'
+# Allow overriding portal gateway
+if [ ! -z $VPNGW ]; then
+    URL_PORTAL="https://${VPNGW}-access.motorolasolutions.com"
+fi
+
 URL_LOGIN="${URL_PORTAL}/dana-na/auth/url_default/login.cgi"
 
 # These are dependent on what user has configured in Okta
@@ -35,13 +40,12 @@ url_pass=$(echo -n $pass | jq -s -R -r @uri)
 
 unset pass
 
-data="username=${user}&password=${url_pass}&realm=${realm}&btnSubmit=Sign+In"
+data="tz_offset=0&username=${user}&password=${url_pass}&realm=${realm}&btnSubmit=Sign+In"
 unset url_pass
 
-# -H 'Content-Type: application/x-www-form-urlencoded'
-
 echo -e "\n\nLogging in to Access Motorola Portal..."
-p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -o /dev/null -w '%{redirect_url}')
+p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -H "Referer: ${URL_PORTAL}/dana-na/auth/url_default/welcome.cgi" -H 'Content-Type: application/x-www-form-urlencoded' -o /dev/null -w '%{redirect_url}')
+
 unset data
 
 # Check the 302 redirect URL
@@ -77,6 +81,6 @@ fi
 
 echo "VPN Cookie: $vpn_cookie"
 echo -e "Launching OpenConnect with VPN Cookie..."
-openconnect --juniper --timestamp -C "$vpn_cookie" $URL_PORTAL 
+#openconnect --juniper --timestamp -C "$vpn_cookie" $URL_PORTAL 
 echo "Disabling ESP since rekey issue (after ~1hr) is still unresolved."
 openconnect --juniper --timestamp --no-dtls -C "$vpn_cookie" $URL_PORTAL 

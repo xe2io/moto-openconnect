@@ -1,5 +1,9 @@
-#!/bin/bash
+systemctl is-active docker --quiet
+if [ 0 -ne $? ]; then
+    sudo systemctl start docker
+fi
 
-# Set up authorized keys and sshd
-
-docker run -it --rm --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 --name motoremote registry.xe2/openconnect /mototunnel
+# There likely needs to be an SELinux policy created to allow docker to access /dev/net/tun
+# Use --privileged as a temporary workaround
+#sudo docker run -it --rm --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 --name motoremote r.xe2.io/openconnect:moto /mototunnel
+sudo docker run -it --rm --privileged --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 -v VPNGW=chicago --name motoremote r.xe2.io/openconnect:moto /mototunnel

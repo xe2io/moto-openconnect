@@ -1,9 +1,25 @@
-systemctl is-active docker --quiet
-if [ 0 -ne $? ]; then
-    sudo systemctl start docker
-fi
+#!/bin/bash
 
-# There likely needs to be an SELinux policy created to allow docker to access /dev/net/tun
-# Use --privileged as a temporary workaround
-#sudo docker run -it --rm --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 --name motoremote r.xe2.io/openconnect:moto /mototunnel
-sudo docker run -it --rm --privileged --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 -v VPNGW=chicago --name motoremote r.xe2.io/openconnect:moto /mototunnel
+OPENCONNECT_IMG="openconnect:moto"
+# Assumes openconnect image is built as $OPENCONNECT_IMG
+# Volume mount SSH public key for tunneling to /motoremote.pub
+# or directly map /root/.ssh/authorized_keys (with correct permissions)
+
+# Can use sshd as a SOCKS proxy; example SSH config:
+#Host motoremote
+#    HostName localhost
+#    Port 60022
+#    User root
+#    # Example portforward for internal RDP
+#    #LocalForward 3389 cst-rds.sit.mot-solutions.com:3389
+#    # SOCKS proxy for accessing internal sites via Firefox
+#    DynamicForward 60000
+#    IdentityFile ~/.ssh/id_ed25519-motoremote
+#
+# Can tunnel via motoremote container to internal SSH host; just add:
+#    ProxyCommand ssh -q -W %h:%p motoremote
+#
+# Chrome *may* now work for internal sites; it used to not pass DNS over SOCKS.
+
+
+docker run -it --rm --cap-add=NET_ADMIN --device /dev/net/tun -p 60022:22 --name motoremote $OPENCONNECT_IMG /mototunnel

@@ -1,11 +1,23 @@
 #!/bin/bash
 
+ssh_pubkey="/motoremote.pub"
+authorized_keys_file="/root/.ssh/authorized_keys"
+
 # hardcode files for now
 mkdir -p /run/sshd /root/.ssh /etc/ssh \
     && chmod 700 /root/.ssh \
     && echo 'PermitRootLogin without-password' >> /etc/ssh/sshd_config \
-    && echo 'TCPKeepAlive yes' >> /etc/ssh/sshd_config \
-    && echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkFKmtyEjVcYDS1NMK760cn5oLaZNOKRjjOkh0wmRbj' > /root/.ssh/authorized_keys
+    && echo 'TCPKeepAlive yes' >> /etc/ssh/sshd_config
+
+# Configure SSH key for tunneling
+if [ -e $ssh_pubkey ]; then
+    echo "Found SSH pubkey for tunnel; adding to authorized keys."
+    cat $ssh_pubkey > $authorized_keys_file
+
+else
+    echo "No pubkey found in $ssh_pubkey.  Adding hardcoded default."
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICkFKmtyEjVcYDS1NMK760cn5oLaZNOKRjjOkh0wmRbj" > $authorized_keys_file
+fi
     
 # Run sshd so we can tunnel
 /usr/sbin/sshd

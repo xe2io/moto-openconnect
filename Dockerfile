@@ -1,4 +1,4 @@
-FROM registry.xe2/debian:stretch-slim
+FROM r.xe2.io/debian:stretch-slim
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \
@@ -12,6 +12,6 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-COPY mototunnel vpn_login.sh vpn_uptime /
+COPY mototunnel vpn_login.sh /
 
 CMD ["/mototunnel"]

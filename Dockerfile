@@ -1,4 +1,4 @@
-FROM r.xe2.io/debian:stretch-slim
+FROM r.xe2.io/debian:buster-slim
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \

@@ -43,21 +43,30 @@ unset pass
 data="tz_offset=0&username=${user}&password=${url_pass}&realm=${realm}&btnSubmit=Sign+In"
 unset url_pass
 
+# Capture response headers for defender_id
+headers_file=$(mktemp)
+
 echo -e "\n\nLogging in to Access Motorola Portal..."
-p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -H "Referer: ${URL_PORTAL}/dana-na/auth/url_default/welcome.cgi" -H 'Content-Type: application/x-www-form-urlencoded' -o /dev/null -w '%{redirect_url}')
+p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -H "Referer: ${URL_PORTAL}/dana-na/auth/url_default/welcome.cgi" -H 'Content-Type: application/x-www-form-urlencoded' -o /dev/null -w '%{redirect_url} -D $headers_file')
 
 unset data
 
 # Check the 302 redirect URL
 # Failure: https://access.motorolasolutions.com/dana-na/auth/url_default/welcome.cgi?p=failed
-# Success: https://access.motorolasolutions.com/dana-na/auth/url_default/welcome.cgi?p=defender&id=state_####
+# Success: https://access.motorolasolutions.com/dana-na/auth/url_default/welcome.cgi?p=defender
 if [[ "$p1_url" == *failed ]]; then
     echo "Failed login.  Please check credentials."
     exit 1
 fi
 
-# Grab the defender state ID to pass to phase 2
-defender_id=${p1_url##*defender&id=}
+# Grab the defender state ID (set in cookie) to pass to phase 2
+defender_id=$(grep -Po '(?<=Set-Cookie: id=)(state_[0-9a-f]{32})' $headers_file)
+rm $headers_file
+
+if [[ -z "$defender_id" ]]; then
+    echo "ERROR: Failed to retrieve defender state ID."
+    exit 1
+fi
 
 ### PHASE 2: Choose Okta Push (2) for 2FA
 data="username=${user}&key=${defender_id}&password=${okta_action}&btnAction=++Sign+In++"

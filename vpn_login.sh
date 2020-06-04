@@ -47,7 +47,7 @@ unset url_pass
 headers_file=$(mktemp)
 
 echo -e "\n\nLogging in to Access Motorola Portal..."
-p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -H "Referer: ${URL_PORTAL}/dana-na/auth/url_default/welcome.cgi" -H 'Content-Type: application/x-www-form-urlencoded' -o /dev/null -w '%{redirect_url} -D $headers_file')
+p1_url=$(curl -s ${URL_LOGIN} --data "${data}" -H "Referer: ${URL_PORTAL}/dana-na/auth/url_default/welcome.cgi" -H 'Content-Type: application/x-www-form-urlencoded' -o /dev/null -w '%{redirect_url}' -D $headers_file)
 
 unset data
 

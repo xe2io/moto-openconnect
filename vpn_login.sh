@@ -76,8 +76,35 @@ data="username=${user}&key=${defender_id}&password=${okta_action}&btnAction=++Si
 echo "Requesting Okta Push.  Please acknowledge 2FA to continue."
 cookie_file=$(mktemp)
 
-curl -L -s ${URL_LOGIN} -o /dev/null --data "${data}" -c $cookie_file
+headers_file=$(mktemp)
+p2_url=$(curl -L -s ${URL_LOGIN} -o /dev/null --data "${data}" -c $cookie_file -w '%{redirect_url}' -D $headers_file)
 unset data
+
+### There may be a motd/banner interjected here.  a POST to proceed is required
+# TODO: p2_url is not set properly; the behavior is a 302 is returned to welcome.cgi?p=sn%2Dpostauth%Dshow
+# Banners appear only once per day on a successful 'proceed'.  Use vpn_cookie detection for now.
+
+echo "Cookies ($cookie_file):"
+cat $cookie_file
+echo "Headers file ($headers_file):"
+cat $headers_file
+echo "P2 URL: $p2_url"
+
+rm $headers_file
+
+### POST to proceed on motd/banner page
+# TODO: better banner page detection
+vpn_cookie=$(awk 'match($0, /DSID.*[a-f0-9]+/) {printf "%s=%s", $(NF-1), $NF}' $cookie_file)
+if [[ -z "$vpn_cookie" ]]; then
+    # Post data:
+    # key=state_#### (id= value set in cookie)
+    # sn-postauth-text= (value from the intermediate page)
+    # sn-postauth-proceed=Proceed
+    data="username=${user}&key=${defender_id}&sn-postauth-proceed=Proceed"
+
+    curl -L -s ${URL_LOGIN} -o /dev/null --data "${data}" -c $cookie_file 
+    unset data
+fi
 
 vpn_cookie=$(awk 'match($0, /DSID.*[a-f0-9]+/) {printf "%s=%s", $(NF-1), $NF}' $cookie_file)
 rm $cookie_file
